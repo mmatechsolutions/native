@@ -1,62 +1,79 @@
 import { useState } from 'react';
-import { StyleSheet, Text, FlatList, View, Image, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, FlatList, View, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import Header from './components/header';
+import TodoItem from './components/todoitem';
+import AddTodo from './components/addTodo';
 
 export default function App() {
-  const [people, setPeople] = useState([
-    { key: 1, name: 'Alice' },
-    { key: 2, name: 'Bob' },
-    { key: 3, name: 'Charlie' },
-    { key: 4, name: 'Diana' },
-    { key: 5, name: 'Ethan' },
-    { key: 6, name: 'Fiona' },
-    { key: 7, name: 'George' },
-    { key: 8, name: 'Hannah' },
-    { key: 9, name: 'Isaac' },
-    { key: 10, name: 'Jasmine' },
-    { key: 11, name: 'Kevin' },
-    { key: 12, name: 'Luna' },
-    { key: 13, name: 'Marcus' },
-    { key: 14, name: 'Nina' },
-    { key: 15, name: 'Oscar' }
+  const [todos, setTodos] = useState([
+    { id: 1, title: 'Buy groceries' },
+    { id: 2, title: 'Walk the dog' },
+    { id: 3, title: 'Finish project report' },
+    { id: 4, title: 'Call Mom' },
+    { id: 5, title: 'Read a book' },
+    { id: 6, title: 'Workout' },
+    { id: 7, title: 'Clean the house' },
+    { id: 8, title: 'Pay bills' },
+    { id: 9, title: 'Check emails' },
+    { id: 10, title: 'Talk to Neema' }
   ]);
 
-  const handlePress = (key) => {
-    // Alert.alert('You tapped on', name);
-    setPeople((prevPeople) =>{
-      return prevPeople.filter(person => person.key !== key)
+
+  const pressHandler = (id) =>{
+    setTodos((prevTodos)=>{
+      return prevTodos.filter( todo => todo.id !== id)
+    })
+  }
+
+  const submitHandler = (text) => {
+
+    if(text.trim() === ""){
+      Alert.alert('OOPS',"Cannot add empty task",[
+        {text: 'OK'}
+      ])
+    } else{
+      setTodos((prevTodos) =>{
+      return[
+        {title: text, id: Math.random().toString()},
+        ...prevTodos
+      ];
     });
+    }
+    
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.head}>People</Text>
 
-      <FlatList
-      numColumns={3}
-      keyExtractor={(item)=>item.key.toString()}
-      data={people}
-      renderItem={({item})=>(
-        <TouchableOpacity onPress={()=> handlePress(item.key)}>
-          <Text style={styles.item}>{item.name} </Text>
-        </TouchableOpacity>
-        
-      )}/>
-    </View>
+  return (
+    <TouchableWithoutFeedback onPress={ ()=>{
+      Keyboard.dismiss();
+    }}>
+      <View style={styles.container}>
+        <Header/>
+        <View style={styles.content}> 
+          <AddTodo submitHandler={submitHandler}/>
+
+          <View style={styles.list}>
+            <FlatList
+            data={todos}
+            renderItem={({item})=>(
+              <TodoItem item={item} pressHandler={pressHandler}/>
+            )}/>
+          </View>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 40,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
+  container:{
+    flex:1,
+    backgroundColor:'#fff'
   },
-  item: {
-    flex: 1,
-    marginHorizontal: 10,
-    marginTop: 24,
-    padding: 30,
-    backgroundColor: 'pink',
-    fontSize: 24,
+  content:{
+    padding:40,
   },
+  list:{
+    marginTop:30
+  }
+  
 });
